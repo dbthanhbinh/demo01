@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, redirect
 
 app = Flask(__name__)
 
@@ -25,3 +25,46 @@ def app_users():
 
     view = 'users/index.html'
     return render_template(view, datalist=data)
+
+@app.route('/users/add')
+def app_add_user():
+    view = 'users/add.html'
+    return render_template(view)
+
+@app.route('/users/add', methods=['POST'])
+def app_doAdd_user():
+
+    try:
+        userName = request.form['username']
+        userEmail = request.form['email']
+        userPass = request.form['password']
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO users (id, name, email, password, active) VALUE(null, '" + userName + "', '" + userEmail + "', '" + userPass + "',1)")
+        conn.commit()
+
+        data = cursor.fetchall()
+
+    except Exception as e:
+        return 'Error'
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('app_users'))
+
+@app.route('/users/edit/<int:id>')
+def app_edit_user(id):
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id=" + id)
+    data = cursor.fetchall()
+
+    view = 'users/edit.html'
+    return render_template(view, objData=data)
+
+@app.route('/users/edit/<int:id>', methods = ['POST'])
+def app_doEdit_user(id):
+    return redirect (url_for('app_users'))
