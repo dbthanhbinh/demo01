@@ -1,0 +1,15 @@
+{% extends '_layout/_master.html' %}
+
+{% block main %}
+<div class="col-lg-8">
+  <!-- Title -->
+  <h1 class="mt-4">User List</h1>
+
+    {% for item in datalist %}
+        <option
+        {{ item }}</option>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
