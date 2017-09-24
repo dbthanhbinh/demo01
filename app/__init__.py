@@ -56,15 +56,36 @@ def app_doAdd_user():
 
 @app.route('/users/edit/<int:id>')
 def app_edit_user(id):
-
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE id=" + id)
-    data = cursor.fetchall()
+    cursor.execute("SELECT * FROM users WHERE id = %s",id)
+    data = cursor.fetchone()
 
     view = 'users/edit.html'
     return render_template(view, objData=data)
 
 @app.route('/users/edit/<int:id>', methods = ['POST'])
 def app_doEdit_user(id):
+    userName = request.form['username']
+    userEmail = request.form['email']
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET name = %s, email = %s  WHERE id = %s", (userName, userEmail, id))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+    return redirect (url_for('app_users'))
+
+@app.route('/users/delete/<int:id>', methods = ['GET'])
+def app_doDelete_user(id):
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id = %s", id)
+    conn.commit()
+
+    cursor.close()
+    conn.close()
     return redirect (url_for('app_users'))
