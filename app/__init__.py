@@ -11,6 +11,7 @@ app.config['MYSQL_DATABASE_DB'] = 'demo01'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
+
 @app.route('/')
 def app_home():
     view = 'home/index.html'
@@ -89,3 +90,18 @@ def app_doDelete_user(id):
     cursor.close()
     conn.close()
     return redirect (url_for('app_users'))
+
+
+# API
+from flask_restful import Resource, Api
+
+api = Api(app)
+
+class UsersApi(Resource):
+    def get(self):
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT * FROM users")
+        #data = cursor.fetchall()
+        return {'usersList': cursor.fetchall()}
+
+api.add_resource(UsersApi,'/usersapi')
